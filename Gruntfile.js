@@ -11,23 +11,27 @@ module.exports = function(grunt) {
       options: {
         node: true
       },
-      src: ['models/**/*.js', 'server.js', 'routes/**/*.js']
+      src: ['app/**/*.js']
     },
 
     jscs: {
-      src: ['models/**/*.js', 'server.js', 'routes/**/*.js'],
+      src: ['app/**/*.js'],
       options: {
         config: '.jscsrc'
       }
     },
 
     simplemocha: {
-      src: ['test/api/**/*.js']
+      src: ['test/**/*.js']
     },
 
     clean: {
       dev: {
         src: ['build/']
+      },
+
+      test: {
+        src: ['test/test-build']
       }
     },
 
@@ -37,6 +41,12 @@ module.exports = function(grunt) {
         src: ['**/*.html', '**/*.css'],
         expand: true,
         dest: 'build/'
+      },
+      test: {
+        cwd: 'app/',
+        src: ['**/*.html', '**/*.css'],
+        expand: true,
+        dest: '../test/test-build'
       }
     },
 
@@ -47,11 +57,19 @@ module.exports = function(grunt) {
         options: {
           transform: ['debowerify']
         }
+      },
+
+      test: {
+        src: ['test/some_test.js'],
+        dest: 'test/test-build/test-bundle.js',
+        options: {
+          transform: ['debowerify']
+        }
       }
     }
   });
 
-  grunt.registerTask('test', ['jshint', 'jscs', 'simplemocha']);
+  grunt.registerTask('test', ['jshint', 'jscs', 'clean:test', 'browserify:test', 'copy:test']);
   grunt.registerTask('build:dev', ['clean:dev', 'browserify:dev', 'copy:dev']);
   grunt.registerTask('default', ['test', 'build:dev']);
 };
